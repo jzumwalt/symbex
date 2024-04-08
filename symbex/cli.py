@@ -396,7 +396,7 @@ def cli(
         for directory in directories:
             for path in pathlib.Path(directory).rglob("*.py"):
                 # Skip if path is inside any of 'excludes'
-                if any(is_subpath(path, exclude) for exclude in excludes):
+                if any(path.resolve().is_relative_to(exclude) for exclude in excludes):
                     continue
                 if path.is_file():
                     yield path
@@ -599,14 +599,6 @@ def cli(
         old = filepath.read_text("utf-8")
         new = old.replace(to_replace, replacement)
         filepath.write_text(new, "utf-8")
-
-
-def is_subpath(path: pathlib.Path, parent: pathlib.Path) -> bool:
-    try:
-        path.relative_to(parent)
-        return True
-    except ValueError:
-        return False
 
 
 def is_dunder(name):
